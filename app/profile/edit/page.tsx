@@ -27,7 +27,7 @@ export default async function EditProfilePage() {
   }
 
   return (
-    <div className="container max-w-md py-8">
+    <div className="container mx-auto max-w-md py-8">
       <Link
         href={`/profile/${user._id}`}
         className="flex items-center text-sm mb-6 hover:underline"
