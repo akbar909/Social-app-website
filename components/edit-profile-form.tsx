@@ -136,7 +136,7 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mx-auto">
         <div className="flex flex-col items-center gap-4">
           <Avatar className="h-24 w-24">
             <AvatarImage src={imageUrl || "/placeholder.svg?height=200&width=200"} alt={user.name} />
