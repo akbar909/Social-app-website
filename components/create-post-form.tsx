@@ -180,6 +180,7 @@ export function CreatePostForm() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
                 <input
+                  title="file"
                   type="file"
                   accept="image/*"
                   className="hidden"

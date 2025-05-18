@@ -144,7 +144,7 @@ export function EditProfileForm({ user }: EditProfileFormProps) {
           </Avatar>
 
           <div>
-            <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} ref={fileInputRef} />
+            <input title="file" type="file" accept="image/*" className="hidden" onChange={handleFileChange} ref={fileInputRef} />
             <Button
               type="button"
               variant="outline"

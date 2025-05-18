@@ -1,14 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useInView } from "react-intersection-observer"
-import { Loader2 } from "lucide-react"
 import { PostCard } from "@/components/post-card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import type { Post } from "@/types"
+import { Loader2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import type { Post } from "@/types"
+import { useEffect, useState } from "react"
+import { useInView } from "react-intersection-observer"
 
 interface FeedProps {
   type: "latest" | "following"
@@ -30,7 +30,7 @@ export function Feed({ type }: FeedProps) {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`/api/posts?page=${page}&limit=10&type=${type}`)
+      const response = await fetch(`/api/posts?page=${page}`)
 
       if (!response.ok) {
         throw new Error("Failed to fetch posts")
@@ -67,6 +67,10 @@ export function Feed({ type }: FeedProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView])
+
+  const handleDeletePost = (post: Post) => {
+    setPosts((prev) => prev.filter((p) => p._id !== post._id));
+  };
 
   if (initialLoading) {
     return (
@@ -120,7 +124,7 @@ export function Feed({ type }: FeedProps) {
   return (
     <div className="space-y-6">
       {posts.map((post) => (
-        <PostCard key={post._id} post={post} />
+        <PostCard key={post._id} post={post} onDelete={() => handleDeletePost(post)} />
       ))}
 
       {hasMore && (

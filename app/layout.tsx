@@ -1,12 +1,12 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
+import AuthProvider from "@/components/auth-provider"
+import Footer from "@/components/footer"
+import Header from "@/components/header"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
-import AuthProvider from "@/components/auth-provider"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import type React from "react"
+import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 

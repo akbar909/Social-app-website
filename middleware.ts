@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
 import { getToken } from "next-auth/jwt"
+import type { NextRequest } from "next/server"
+import { NextResponse } from "next/server"
 
 // Generate a secure secret if one is not provided
 const secret = process.env.NEXTAUTH_SECRET || "123456789"
@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     })
 
     // Protected routes
-    const protectedRoutes = ["/create", "/profile/edit"]
+    const protectedRoutes = ["/create", "/profile/edit", "/feed"]
 
     // Check if the route is protected and user is not authenticated
     if (protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route)) && !token) {
@@ -32,5 +32,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/create", "/profile/edit"],
+  matcher: ["/create", "/profile/edit", "/feed"],
 }

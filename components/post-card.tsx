@@ -3,7 +3,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
 import type { Post } from "@/types"
 import { formatDistanceToNow } from "date-fns"
@@ -16,9 +21,10 @@ import { useState } from "react"
 
 interface PostCardProps {
   post: Post
+  onDelete: (id: string) => void
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, onDelete }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(post.isLiked || false)
   const [likeCount, setLikeCount] = useState(post.likeCount || 0)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -75,7 +81,7 @@ export function PostCard({ post }: PostCardProps) {
         description: "Post deleted successfully",
       })
 
-      router.refresh()
+      onDelete(post._id)
     } catch (error) {
       toast({
         title: "Error",
@@ -90,21 +96,24 @@ export function PostCard({ post }: PostCardProps) {
   const isAuthor = session?.user?.email === post.author.email
 
   return (
-    <Card className="overflow-hidden w-full max-w-full">
-      <CardHeader className="flex flex-row items-center gap-3 p-3 sm:p-4">
+    <Card className="overflow-hidden w-full max-w-2xl mx-auto mb-4 rounded-xl">
+      <CardHeader className="flex flex-row items-center gap-4 p-4">
         <Link href={`/profile/${post.author._id}`}>
-          <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
+          <Avatar className="h-10 w-10">
             <AvatarImage src={post.author.image || ""} alt={post.author.name} />
             <AvatarFallback>{post.author.name?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
         </Link>
-        <div className="grid gap-1">
-          <Link href={`/profile/${post.author._id}`} className="font-semibold text-sm sm:text-base hover:underline">
+        <div className="flex flex-col">
+          <Link
+            href={`/profile/${post.author._id}`}
+            className="font-medium text-sm sm:text-base hover:underline"
+          >
             {post.author.name}
           </Link>
-          <div className="text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
-          </div>
+          </span>
         </div>
 
         {isAuthor && (
@@ -131,32 +140,37 @@ export function PostCard({ post }: PostCardProps) {
 
       <Link href={`/post/${post._id}`}>
         <CardContent className="p-0">
-          {post.content && <div className="px-3 sm:px-4 py-2 text-sm sm:text-base">{post.content}</div>}
+          {post.content && (
+            <div className="px-4 pb-3 text-sm sm:text-base leading-relaxed">
+              {post.content}
+            </div>
+          )}
 
           {post.mediaUrls && post.mediaUrls.length === 1 && (
-            <div className="relative aspect-video w-full overflow-hidden">
+            <div className="w-full flex justify-center items-center bg-black/5 px-4 py-2">
               <Image
                 src={post.mediaUrls[0] || "/placeholder.svg?height=400&width=600"}
                 alt="Post image"
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 100vw, (max-width: 768px) 80vw, 768px"
-                priority
+                width={800}
+                height={600}
+                className="max-w-full h-auto rounded-md"
               />
             </div>
           )}
 
           {post.mediaUrls && post.mediaUrls.length > 1 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 px-3 sm:px-4 py-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 px-4 py-2">
               {post.mediaUrls.map((url, idx) => (
-                <div key={idx} className="relative aspect-video w-full h-48 sm:h-56 md:h-64 overflow-hidden rounded-md">
+                <div
+                  key={idx}
+                  className="w-full flex justify-center items-center bg-black/5 rounded-md overflow-hidden"
+                >
                   <Image
                     src={url || "/placeholder.svg?height=400&width=600"}
                     alt={`Post image ${idx + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    priority={idx === 0}
+                    width={400}
+                    height={300}
+                    className="w-full h-auto object-contain"
                   />
                 </div>
               ))}
@@ -165,7 +179,7 @@ export function PostCard({ post }: PostCardProps) {
         </CardContent>
       </Link>
 
-      <CardFooter className="flex items-center p-3 sm:p-4">
+      <CardFooter className="flex items-center p-3 sm:p-4 gap-4">
         <Button variant="ghost" size="sm" className="gap-1 h-8" onClick={handleLike}>
           <Heart className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : ""}`} />
           <span>{likeCount}</span>
