@@ -10,7 +10,7 @@ export default async function LandingPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground px-4">
+    <div className="flex flex-col items-center justify-center mt-6 bg-background text-foreground px-4">
       <header className="text-center mb-8">
         <h1 className="text-5xl font-extrabold mb-4">Welcome to SocialApp</h1>
         <p className="text-lg text-muted-foreground max-w-2xl">

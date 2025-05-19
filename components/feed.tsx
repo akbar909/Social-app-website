@@ -30,7 +30,8 @@ export function Feed({ type }: FeedProps) {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`/api/posts?page=${page}`)
+     const response = await fetch(`/api/posts?page=${page}&limit=2&type=${type}`)
+
 
       if (!response.ok) {
         throw new Error("Failed to fetch posts")
