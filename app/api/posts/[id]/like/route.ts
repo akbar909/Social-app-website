@@ -27,11 +27,11 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     }
 
     // Check if user already liked the post
-    const alreadyLiked = post.likes.some((like) => like.userId.toString() === user._id.toString())
+    const alreadyLiked = post.likes.some((like:any) => like.userId.toString() === user._id.toString())
 
     if (alreadyLiked) {
       // Unlike the post
-      post.likes = post.likes.filter((like) => like.userId.toString() !== user._id.toString())
+      post.likes = post.likes.filter((like:any) => like.userId.toString() !== user._id.toString())
     } else {
       // Like the post
       post.likes.push({

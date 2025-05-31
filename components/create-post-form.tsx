@@ -2,18 +2,18 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
-import { Card, CardContent } from "@/components/ui/card"
-import { ImageIcon, X, Loader2 } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ImageIcon, Loader2, X } from "lucide-react"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { useRef, useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
 const formSchema = z.object({
   content: z.string().max(500, {
@@ -36,6 +36,14 @@ export function CreatePostForm() {
     },
   })
 
+  const allowedTypes = [
+    "image/",
+    "video/mp4",
+    "video/webm",
+    "video/ogg",
+  ]
+  const maxSize = 50 * 1024 * 1024 // 50MB
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
 
@@ -46,6 +54,18 @@ export function CreatePostForm() {
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i]
+        // Validate file type and size
+        const isAllowedType = allowedTypes.some((type) =>
+          file.type.startsWith(type)
+        )
+        if (!isAllowedType || file.size > maxSize) {
+          toast({
+            title: "Invalid file",
+            description: "Only images and videos (max 50MB) are allowed.",
+            variant: "destructive",
+          })
+          continue
+        }
         const formData = new FormData()
         formData.append("file", file)
 
@@ -156,13 +176,22 @@ export function CreatePostForm() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {mediaUrls.map((url, index) => (
                   <div key={index} className="relative aspect-video">
-                    <Image
-                      src={url || "/placeholder.svg?height=400&width=600"}
-                      alt="Media preview"
-                      fill
-                      className="object-cover rounded-md"
-                      sizes="(max-width: 640px) 100vw, 300px"
-                    />
+                    {url.match(/\.(mp4|webm|ogg)$/i) ? (
+                      <video
+                        src={url}
+                        controls
+                        className="object-cover rounded-md w-full h-full"
+                        style={{ background: "#000" }}
+                      />
+                    ) : (
+                      <Image
+                        src={url || "/placeholder.svg?height=400&width=600"}
+                        alt="Media preview"
+                        fill
+                        className="object-cover rounded-md"
+                        sizes="(max-width: 640px) 100vw, 300px"
+                      />
+                    )}
                     <Button
                       type="button"
                       variant="destructive"
@@ -182,7 +211,7 @@ export function CreatePostForm() {
                 <input
                   title="file"
                   type="file"
-                  accept="image/*"
+                  accept="image/*,video/mp4,video/webm,video/ogg"
                   className="hidden"
                   onChange={handleFileChange}
                   ref={fileInputRef}

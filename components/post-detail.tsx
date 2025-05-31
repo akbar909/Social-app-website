@@ -1,5 +1,6 @@
 "use client"
 
+import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
@@ -134,30 +135,49 @@ export function PostDetail({ post }: PostDetailProps) {
         {post.content && <div className="text-sm mb-4">{post.content}</div>}
 
         {post.mediaUrls && post.mediaUrls.length === 1 && (
-          <div className="relative aspect-video w-full overflow-hidden rounded-md">
-            <Image
-              src={post.mediaUrls[0] || "/placeholder.svg?height=400&width=600"}
-              alt="Post image"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 768px"
-            />
+          <div className="w-full flex justify-center items-center px-0 py-0">
+            <AspectRatio ratio={16 / 9} className="w-full">
+              {post.mediaUrls[0].match(/\.(mp4|webm|ogg)$/i) ? (
+                <video
+                  src={post.mediaUrls[0]}
+                  controls
+                  className="w-full h-full object-cover rounded-xl bg-black group-hover:scale-[1.01] transition-transform duration-200"
+                  style={{ maxHeight: 420 }}
+                />
+              ) : (
+                <Image
+                  src={post.mediaUrls[0] || "/placeholder.svg?height=400&width=600"}
+                  alt="Post media"
+                  fill
+                  className="object-cover rounded-xl group-hover:scale-[1.01] transition-transform duration-200"
+                  sizes="(max-width: 768px) 100vw, 768px"
+                />
+              )}
+            </AspectRatio>
           </div>
         )}
 
         {post.mediaUrls && post.mediaUrls.length > 1 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-3 px-4 py-2">
             {post.mediaUrls.map((url, idx) => (
-              <div key={idx} className="relative aspect-video w-full h-48 sm:h-56 md:h-64 overflow-hidden rounded-md">
-                <Image
-                  src={url || "/placeholder.svg?height=400&width=600"}
-                  alt={`Post image ${idx + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  priority={idx === 0}
-                />
-              </div>
+              <AspectRatio ratio={16 / 10} key={idx} className="w-full">
+                {url.match(/\.(mp4|webm|ogg)$/i) ? (
+                  <video
+                    src={url}
+                    controls
+                    className="w-full h-full object-cover rounded-xl bg-black group-hover:scale-[1.01] transition-transform duration-200"
+                    style={{ maxHeight: 340 }}
+                  />
+                ) : (
+                  <Image
+                    src={url || "/placeholder.svg?height=400&width=600"}
+                    alt={`Post media ${idx + 1}`}
+                    fill
+                    className="object-cover rounded-xl group-hover:scale-[1.01] transition-transform duration-200"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                )}
+              </AspectRatio>
             ))}
           </div>
         )}

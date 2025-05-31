@@ -1,6 +1,7 @@
 "use client"
 
 import { PostCard } from "@/components/post-card"
+import { StoriesBar } from "@/components/stories-bar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import type { Post } from "@/types"
@@ -14,6 +15,8 @@ interface FeedProps {
   type: "latest" | "following"
 }
 
+const POSTS_PER_PAGE = 6;
+
 export function Feed({ type }: FeedProps) {
   const [posts, setPosts] = useState<Post[]>([])
   const [page, setPage] = useState(1)
@@ -24,21 +27,24 @@ export function Feed({ type }: FeedProps) {
   const { data: session } = useSession()
   const router = useRouter()
 
+  useEffect(() => {
+    setPosts([])
+    setPage(1)
+    setHasMore(true)
+    setInitialLoading(true)
+  }, [type])
+
   const fetchPosts = async () => {
     if (isLoading || !hasMore) return
 
     setIsLoading(true)
 
     try {
-     const response = await fetch(`/api/posts?page=${page}&limit=2&type=${type}`)
-
-
+      const response = await fetch(`/api/posts?page=${page}&limit=${POSTS_PER_PAGE}&type=${type}`)
       if (!response.ok) {
         throw new Error("Failed to fetch posts")
       }
-
       const data = await response.json()
-
       if (data.posts.length === 0) {
         setHasMore(false)
       } else {
@@ -60,7 +66,7 @@ export function Feed({ type }: FeedProps) {
   useEffect(() => {
     fetchPosts()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [type])
 
   useEffect(() => {
     if (inView) {
@@ -123,16 +129,19 @@ export function Feed({ type }: FeedProps) {
   }
 
   return (
-    <div className="space-y-6">
-      {posts.map((post) => (
-        <PostCard key={post._id} post={post} onDelete={() => handleDeletePost(post)} />
-      ))}
+    <>
+      <StoriesBar />
+      <div className="space-y-6 mt-2">
+        {posts.map((post) => (
+          <PostCard key={post._id} post={post} onDelete={() => handleDeletePost(post)} />
+        ))}
 
-      {hasMore && (
-        <div ref={ref} className="flex justify-center py-6">
-          {isLoading && <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />}
-        </div>
-      )}
-    </div>
+        {hasMore && (
+          <div ref={ref} className="flex justify-center py-6">
+            {isLoading && <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />}
+          </div>
+        )}
+      </div>
+    </>
   )
 }

@@ -1,5 +1,6 @@
 "use client"
 
+import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
@@ -96,18 +97,18 @@ export function PostCard({ post, onDelete }: PostCardProps) {
   const isAuthor = session?.user?.email === post.author.email
 
   return (
-    <Card className="overflow-hidden w-full max-w-2xl mx-auto mb-4 rounded-xl">
-      <CardHeader className="flex flex-row items-center gap-4 p-4">
-        <Link href={`/profile/${post.author._id}`}>
-          <Avatar className="h-10 w-10">
+    <Card className="overflow-hidden w-full max-w-2xl mx-auto mb-6 rounded-2xl shadow-md border border-muted bg-background">
+      <CardHeader className="flex flex-row items-center gap-4 p-4 bg-muted/40">
+        <Link href={`/profile/${post.author._id}`} className="shrink-0">
+          <Avatar className="h-12 w-12 border-2 border-primary/20">
             <AvatarImage src={post.author.image || ""} alt={post.author.name} />
             <AvatarFallback>{post.author.name?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
         </Link>
-        <div className="flex flex-col">
+        <div className="flex flex-col flex-1 min-w-0">
           <Link
             href={`/profile/${post.author._id}`}
-            className="font-medium text-sm sm:text-base hover:underline"
+            className="font-semibold text-base truncate hover:underline"
           >
             {post.author.name}
           </Link>
@@ -115,7 +116,6 @@ export function PostCard({ post, onDelete }: PostCardProps) {
             {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
           </span>
         </div>
-
         {isAuthor && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -138,57 +138,76 @@ export function PostCard({ post, onDelete }: PostCardProps) {
         )}
       </CardHeader>
 
-      <Link href={`/post/${post._id}`}>
+      <Link href={`/post/${post._id}`} className="block group focus:outline-none">
         <CardContent className="p-0">
           {post.content && (
-            <div className="px-4 pb-3 text-sm sm:text-base leading-relaxed">
+            <div className="px-4 pt-4 pb-3 text-base leading-relaxed text-foreground">
               {post.content}
             </div>
           )}
 
+          {/* Single Media */}
           {post.mediaUrls && post.mediaUrls.length === 1 && (
-            <div className="w-full flex justify-center items-center bg-black/5 px-4 py-2">
-              <Image
-                src={post.mediaUrls[0] || "/placeholder.svg?height=400&width=600"}
-                alt="Post image"
-                width={800}
-                height={600}
-                className="max-w-full h-auto rounded-md"
-              />
+            <div className="w-full flex justify-center items-center px-0 py-0">
+              <AspectRatio ratio={16 / 9} className="w-full">
+                {post.mediaUrls[0].match(/\.(mp4|webm|ogg)$/i) ? (
+                  <video
+                    src={post.mediaUrls[0]}
+                    controls
+                    className="w-full h-full object-cover rounded-xl bg-black group-hover:scale-[1.01] transition-transform duration-200"
+                    style={{ maxHeight: 420 }}
+                  />
+                ) : (
+                  <Image
+                    src={post.mediaUrls[0] || "/placeholder.svg?height=400&width=600"}
+                    alt="Post media"
+                    fill
+                    className="object-cover rounded-xl group-hover:scale-[1.01] transition-transform duration-200"
+                    sizes="(max-width: 768px) 100vw, 768px"
+                  />
+                )}
+              </AspectRatio>
             </div>
           )}
 
+          {/* Multiple Media */}
           {post.mediaUrls && post.mediaUrls.length > 1 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 px-4 py-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-3 px-4 py-2">
               {post.mediaUrls.map((url, idx) => (
-                <div
-                  key={idx}
-                  className="w-full flex justify-center items-center bg-black/5 rounded-md overflow-hidden"
-                >
-                  <Image
-                    src={url || "/placeholder.svg?height=400&width=600"}
-                    alt={`Post image ${idx + 1}`}
-                    width={400}
-                    height={300}
-                    className="w-full h-auto object-contain"
-                  />
-                </div>
+                <AspectRatio ratio={16 / 10} key={idx} className="w-full">
+                  {url.match(/\.(mp4|webm|ogg)$/i) ? (
+                    <video
+                      src={url}
+                      controls
+                      className="w-full h-full object-cover rounded-xl bg-black group-hover:scale-[1.01] transition-transform duration-200"
+                      style={{ maxHeight: 340 }}
+                    />
+                  ) : (
+                    <Image
+                      src={url || "/placeholder.svg?height=400&width=600"}
+                      alt={`Post media ${idx + 1}`}
+                      fill
+                      className="object-cover rounded-xl group-hover:scale-[1.01] transition-transform duration-200"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  )}
+                </AspectRatio>
               ))}
             </div>
           )}
         </CardContent>
       </Link>
 
-      <CardFooter className="flex items-center p-3 sm:p-4 gap-4">
-        <Button variant="ghost" size="sm" className="gap-1 h-8" onClick={handleLike}>
-          <Heart className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : ""}`} />
-          <span>{likeCount}</span>
+      <CardFooter className="flex items-center p-3 sm:p-4 gap-4 border-t bg-muted/40">
+        <Button variant="ghost" size="sm" className="gap-1 h-8" onClick={handleLike} aria-label="Like post">
+          <Heart className={`h-5 w-5 ${isLiked ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+          <span className="font-medium text-sm">{likeCount}</span>
         </Button>
 
-        <Link href={`/post/${post._id}`}>
-          <Button variant="ghost" size="sm" className="gap-1 h-8">
-            <MessageCircle className="h-4 w-4" />
-            <span>{post.commentCount || 0}</span>
+        <Link href={`/post/${post._id}`} className="focus:outline-none">
+          <Button variant="ghost" size="sm" className="gap-1 h-8" aria-label="View comments">
+            <MessageCircle className="h-5 w-5 text-muted-foreground" />
+            <span className="font-medium text-sm">{post.commentCount || 0}</span>
           </Button>
         </Link>
       </CardFooter>
