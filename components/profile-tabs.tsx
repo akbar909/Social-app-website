@@ -79,8 +79,7 @@ export function ProfileTabs({ userId }: ProfileTabsProps) {
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-bold mb-2">Portfolio</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Explore all posts shared by this user. This collection showcases their thoughts, 
-            creativity, and contributions to the community.
+            Explore all posts shared by this user. This collection showcases their thoughts, creativity, and contributions to the community.
           </p>
         </div>
         {initialLoading ? (
