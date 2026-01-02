@@ -76,6 +76,12 @@ export function ProfileTabs({ userId }: ProfileTabsProps) {
         <TabsTrigger value="posts">Posts</TabsTrigger>
       </TabsList>
       <TabsContent value="posts">
+        <div className="mb-6 text-center">
+          <h2 className="text-2xl font-bold mb-2">Portfolio</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Explore all posts shared by this user. This collection showcases their thoughts, creativity, and contributions to the community.
+          </p>
+        </div>
         {initialLoading ? (
           <div className="flex justify-center py-10">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
